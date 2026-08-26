@@ -1,0 +1,36 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Light theme brushes -->
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FFF5F8F4"/>
+    <SolidColorBrush x:Key="AppPanelBackgroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="AppControlBackgroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="AppForegroundBrush" Color="#FF20312F"/>
+    <SolidColorBrush x:Key="AppMutedForegroundBrush" Color="#FF607086"/>
+    <SolidColorBrush x:Key="AppBorderBrush" Color="#FFD7E3D8"/>
+    <SolidColorBrush x:Key="AppAccentBrush" Color="#FF0E8A83"/>
+
+    <!-- Extended semantic palette -->
+    <SolidColorBrush x:Key="AppAccentStrongBrush" Color="#FF075E59"/>
+    <SolidColorBrush x:Key="AppAccentSoftBackgroundBrush" Color="#FFE7F5EE"/>
+    <SolidColorBrush x:Key="AppAccentSoftBorderBrush" Color="#FFB9DED1"/>
+    <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="AppCardBorderBrush" Color="#FFCBE1D8"/>
+    <SolidColorBrush x:Key="AppHeaderBarBackgroundBrush" Color="#FF0F766E"/>
+    <SolidColorBrush x:Key="AppHeaderBarForegroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="AppInfoBrush" Color="#FF0B6EA8"/>
+    <SolidColorBrush x:Key="AppInfoSoftBackgroundBrush" Color="#FFEAF4FF"/>
+    <SolidColorBrush x:Key="AppInfoSoftBorderBrush" Color="#FFBFDFFF"/>
+    <SolidColorBrush x:Key="AppHighlightBackgroundBrush" Color="#FFFFF1B8"/>
+    <SolidColorBrush x:Key="AppHighlightBorderBrush" Color="#FFE2C54A"/>
+
+    <!-- Base styles (TextBlock/Control only - structural styles live in App.xaml, theme-aware via DynamicResource) -->
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource AppForegroundBrush}"/>
+    </Style>
+
+    <Style TargetType="Control">
+        <Setter Property="Foreground" Value="{DynamicResource AppForegroundBrush}"/>
+    </Style>
+
+</ResourceDictionary>

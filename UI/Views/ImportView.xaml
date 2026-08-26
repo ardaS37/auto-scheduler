@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="AutoScheduler.UI.Views.ImportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock FontWeight="SemiBold" Text="Proje Kaydet / Yükle" Margin="0,0,0,10"/>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Kaydet" Width="120" Command="{Binding SaveCommand}"/>
+                <Button Content="Yükle" Width="120" Margin="8,0,0,0" Command="{Binding LoadCommand}"/>
+            </StackPanel>
+
+            <TextBlock Margin="0,12,0,0" Text="{Binding LastFilePath}" Opacity="0.8"/>
+            <TextBlock Margin="0,6,0,0" Text="{Binding Status}" FontWeight="SemiBold"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

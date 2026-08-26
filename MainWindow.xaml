@@ -1,0 +1,741 @@
+﻿<Window x:Class="AutoScheduler.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:AutoScheduler.UI.ViewModels"
+        xmlns:views="clr-namespace:AutoScheduler.UI.Views"
+        xmlns:uiConverters="clr-namespace:AutoScheduler.UI.Converters"
+        Title="{Binding WindowTitle}" Height="900" Width="1420"
+        WindowStartupLocation="CenterScreen"
+        Icon="pack://application:,,,/Assets/icon.ico">
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="S" Command="{Binding SaveProjectCommand}"/>
+        <KeyBinding Modifiers="Control" Key="O" Command="{Binding LoadProjectCommand}"/>
+        <KeyBinding Modifiers="Control" Key="Z" Command="{Binding SchedulerVm.UndoCommand}"/>
+        <KeyBinding Modifiers="Control" Key="Y" Command="{Binding SchedulerVm.RedoCommand}"/>
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <uiConverters:EnumDisplayConverter x:Key="EnumDisplay" />
+
+        <!-- ViewModel -> View mapping -->
+        <DataTemplate DataType="{x:Type vm:TemplateViewModel}">
+            <views:TemplateView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:AssignmentsViewModel}">
+            <views:AssignmentsView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:TeachersViewModel}">
+            <views:TeachersView />
+        </DataTemplate>
+
+        <!-- Import (Excel Giriş) şimdilik devre dışı -->
+        <!--<DataTemplate DataType="{x:Type vm:ImportViewModel}">
+            <views:ImportView />
+        </DataTemplate>-->
+
+        <DataTemplate DataType="{x:Type vm:SchedulerViewModel}">
+            <views:SchedulerView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <DockPanel Background="{StaticResource AppBackgroundBrush}">
+        <Menu DockPanel.Dock="Top" Style="{StaticResource ShellMenuStyle}">
+            <Menu.Resources>
+                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ShellMenuItemStyle}"/>
+            </Menu.Resources>
+            <MenuItem Style="{StaticResource ShellMenuItemStyle}">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE8B7;" Style="{StaticResource MenuIconStyle}"/>
+                        <TextBlock Text="Dosya" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Command="{Binding SaveProjectCommand}">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE74E;" Style="{StaticResource MenuIconStyle}"/>
+                            <TextBlock Text="Kaydet..."/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Click="StartNewProjectWizard_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE710;" Style="{StaticResource MenuIconStyle}"/>
+                            <TextBlock Text="Yeni Proje Rehberi..."/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Command="{Binding LoadProjectCommand}">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8E5;" Style="{StaticResource MenuIconStyle}"/>
+                            <TextBlock Text="Yükle..."/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem x:Name="RecentProjectsMenuItem" Header="Son Projeler" SubmenuOpened="RecentProjects_SubmenuOpened"/>
+                <Separator/>
+                <MenuItem Click="Exit_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8BB;" Style="{StaticResource MenuIconStyle}"/>
+                            <TextBlock Text="Çıkış"/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Style="{StaticResource ShellMenuItemStyle}">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE70F;" Style="{StaticResource MenuIconStyle}"/>
+                        <TextBlock Text="Düzenle" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Command="{Binding SchedulerVm.UndoCommand}" InputGestureText="Ctrl+Z">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE7A7;" Style="{StaticResource MenuIconStyle}"/>
+                            <TextBlock Text="Geri Al (Program)"/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Command="{Binding SchedulerVm.RedoCommand}" InputGestureText="Ctrl+Y">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE7A6;" Style="{StaticResource MenuIconStyle}"/>
+                            <TextBlock Text="İleri Al (Program)"/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Style="{StaticResource ShellMenuItemStyle}">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE90F;" Style="{StaticResource MenuIconStyle}"/>
+                        <TextBlock Text="Araçlar" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Header="Ayarlar sekmesine git" Click="OpenSettingsTab_Click"/>
+                <MenuItem Header="Masaüstü kısayolu oluştur" Click="CreateDesktopShortcut_Click"/>
+                <Separator/>
+                <MenuItem Header="Google Forms'tan Öğretmen İçe Aktar..." Click="TeacherSurveyImport_Click"/>
+            </MenuItem>
+
+            <MenuItem Style="{StaticResource ShellMenuItemStyle}">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE713;" Style="{StaticResource MenuIconStyle}"/>
+                        <TextBlock Text="Seçenekler" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Click="LunchBreak_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE823;" Style="{StaticResource MenuIconStyle}"/>
+                            <TextBlock Text="Öğle arası ayarı..."/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Click="FixedLessons_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE787;" Style="{StaticResource MenuIconStyle}"/>
+                            <TextBlock Text="Sabit dersler..."/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Salonları rastgele ata"
+                          IsCheckable="True"
+                          IsChecked="{Binding RandomizeRooms}"
+                          StaysOpenOnClick="True"/>
+
+                <MenuItem Header="Dersleri mümkünse sabah yap"
+                          IsCheckable="True"
+                          IsChecked="{Binding PreferMorning}"
+                          StaysOpenOnClick="True"/>
+
+                <Separator/>
+
+                <MenuItem Header="Aynı öğretmenin dersleri art arda gelmesin"
+                          IsCheckable="True"
+                          IsChecked="{Binding SchedulerVm.AvoidConsecutiveTeacherLessons}"
+                          StaysOpenOnClick="True"/>
+                <MenuItem Header="Aynı öğretmenin derslerini günlere dengeli dağıt"
+                          IsCheckable="True"
+                          IsChecked="{Binding SchedulerVm.BalanceTeacherAcrossDays}"
+                          StaysOpenOnClick="True"/>
+                <Separator/>
+                <MenuItem Header="Program oluştururken rastgele olsun"
+                          IsCheckable="True"
+                          IsChecked="{Binding SchedulerVm.RandomizePlacement}"
+                          StaysOpenOnClick="True"/>
+                <Separator/>
+                <MenuItem Header="İkinci Öğretimi Etkinleştir (yakında)"
+                          IsCheckable="True"
+                          IsEnabled="False"
+                          StaysOpenOnClick="True"
+                          ToolTip="Yer tutucu: ikinci öğretim/öğlenci program desteği henüz uygulanmadı"/>
+            </MenuItem>
+
+            <MenuItem Style="{StaticResource ShellMenuItemStyle}">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE897;" Style="{StaticResource MenuIconStyle}"/>
+                        <TextBlock Text="Yardım" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Click="About_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE946;" Style="{StaticResource MenuIconStyle}"/>
+                            <TextBlock Text="Hakkında"/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Header="Başlangıç öğreticisini aç" Click="ShowWelcomeTutorial_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <TabControl Margin="8"
+                    SelectedIndex="{Binding SelectedTabIndex}">
+            <TabItem Header="Ana Menü">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <Grid Background="{DynamicResource AppBackgroundBrush}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Style="{StaticResource AccentCardBorderStyle}"
+                            Margin="6,6,6,12"
+                            Padding="24"
+                            CornerRadius="18"
+                            Effect="{StaticResource CardShadowEffect}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="320"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel>
+                                <TextBlock Text="AutoScheduler - Ders Programı Hazırlayıcı"
+                                           FontSize="32"
+                                           FontWeight="Black"
+                                           Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                                <TextBlock Text="Şablon, öğretmen-ders atamaları ve program çıktıları için hızlı giriş paneli"
+                                           Margin="0,8,0,0"
+                                           FontSize="15"
+                                           Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,18,0,0">
+                                    <Button Content="Yeni Proje Rehberi"
+                                            Click="StartNewProjectWizard_Click"
+                                            Background="{DynamicResource AppAccentSoftBackgroundBrush}"
+                                            BorderBrush="{DynamicResource AppAccentSoftBorderBrush}"/>
+                                    <Button Content="Program Sağlığını Kontrol Et"
+                                            Margin="8,0,0,0"
+                                            Click="CheckProjectHealth_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <Border Grid.Column="1"
+                                    Style="{StaticResource CardBorderStyle}"
+                                    CornerRadius="14"
+                                    Padding="14"
+                                    Effect="{StaticResource CardShadowEffect}">
+                                <StackPanel>
+                                    <TextBlock Text="Proje Durumu"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                                    <TextBox Text="{Binding Store.ProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="0,6,0,8"
+                                             FontSize="15"
+                                             FontWeight="SemiBold"
+                                             ToolTip="Proje adını buradan düzenleyebilirsin"/>
+                                    <TextBlock Text="{Binding DashboardSummary}"
+                                               Foreground="{DynamicResource AppMutedForegroundBrush}"
+                                               TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding LastSavedLocation}"
+                                               Margin="0,8,0,0"
+                                               TextWrapping="Wrap"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="1" Margin="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2.2*"/>
+                            <ColumnDefinition Width="1.1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <WrapPanel Margin="0,0,14,0">
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Command="{Binding SaveProjectCommand}">
+                            <StackPanel>
+                                <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#0E8A83"/>
+                                <TextBlock Text="Kaydet" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Projeyi JSON olarak kaydet" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Command="{Binding LoadProjectCommand}">
+                            <StackPanel>
+                                <TextBlock Text="&#xE8E5;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#2563EB"/>
+                                <TextBlock Text="Yükle" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Hazır proje dosyasını aç" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Tag="1" Click="DashboardNavigate_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#0E8A83"/>
+                                <TextBlock Text="Şablon" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Günler, ders saatleri ve sınıflar" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Tag="2" Click="DashboardNavigate_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE716;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#E67700"/>
+                                <TextBlock Text="Öğretmen ve Dersler" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Öğretmenler, ders kodları ve atamaları yönetin" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Tag="3" Click="DashboardNavigate_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#0F766E"/>
+                                <TextBlock Text="Öğretmenler" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Fotoğraflı öğretmen kartları ve detay bilgileri" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Tag="4" Click="DashboardNavigate_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#0F766E"/>
+                                <TextBlock Text="Ayarlar" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Oluşturma kuralları ve arama sırası" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Tag="5" Click="DashboardNavigate_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#2563EB"/>
+                                <TextBlock Text="Program" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Atama oluşturun, çarşafı açın ve çıktı alın" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Click="OpenBlanket_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE80A;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#0B7285"/>
+                                <TextBlock Text="Çarşaf" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Öğretmen ve sınıf çarşaf programını aç" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Click="OpenBlanketExport_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE8C8;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#F08C00"/>
+                                <TextBlock Text="Dışa Aktarım" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Çarşaf ve öğretmen çizelgeleri için PDF veya CSV çıktısı alın" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Click="FixedLessons_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE8FD;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#9B5DE5"/>
+                                <TextBlock Text="Sabit Dersler" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Yerleşmesi zorunlu dersleri kilitle" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Click="LunchBreak_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE823;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#D9480F"/>
+                                <TextBlock Text="Öğle Arası" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Öğretmen müsaitliği için aralık ayarı" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Click="ShowWelcomeTutorial_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE8AB;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#0CA678"/>
+                                <TextBlock Text="Kullanım Rehberi" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Başlangıç tanıtımını ve kısa kullanım açıklamalarını açın" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DashboardCardButtonStyle}" Click="About_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#495057"/>
+                                <TextBlock Text="Hakkında" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,4"/>
+                                <TextBlock Text="Versiyon ve hazırlayan bilgisi" Foreground="{DynamicResource AppMutedForegroundBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button>
+                        </WrapPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <Border Style="{StaticResource CardBorderStyle}"
+                                    CornerRadius="14"
+                                    Padding="16"
+                                    Effect="{StaticResource CardShadowEffect}">
+                                <StackPanel>
+                                    <TextBlock Text="Proje Hazırlık Durumu"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                                    <TextBlock Text="{Binding ReadinessLabel}"
+                                               Margin="0,8,0,0"
+                                               FontSize="24"
+                                               FontWeight="Black"
+                                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                                    <ProgressBar Value="{Binding ReadinessScore, Mode=OneWay}"
+                                                 Maximum="100"
+                                                 Height="14"
+                                                 Margin="0,10,0,0"/>
+                                    <TextBlock Text="{Binding ReadinessScore, StringFormat=Hazırlık düzeyi: %{0}}"
+                                               Margin="0,8,0,0"
+                                               FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding ReadinessSummary}"
+                                               Margin="0,10,0,0"
+                                               TextWrapping="Wrap"
+                                               Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource AccentCardBorderStyle}"
+                                    Margin="0,12,0,0"
+                                    CornerRadius="14"
+                                    Padding="16"
+                                    Effect="{StaticResource CardShadowEffect}">
+                                <StackPanel>
+                                    <TextBlock Text="Önerilen Sonraki Adımlar"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                                    <TextBlock Text="Eksik verileri buradan tek tek açabilirsiniz."
+                                               Margin="0,6,0,0"
+                                               TextWrapping="Wrap"
+                                               Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                                    <ItemsControl ItemsSource="{Binding ProjectHealthItems}" Margin="0,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8" Padding="10">
+                                                    <DockPanel>
+                                                        <Button DockPanel.Dock="Right"
+                                                                Content="{Binding ActionLabel}"
+                                                                Margin="8,0,0,0"
+                                                                Click="ProjectHealthNavigate_Click"/>
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Title}"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                                                            <TextBlock Text="{Binding Detail}"
+                                                                       Margin="0,4,0,0"
+                                                                       TextWrapping="Wrap"
+                                                                       Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                                                        </StackPanel>
+                                                    </DockPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="Gerekli girişler tamamsa doğrudan Program ekranına geçerek program oluşturabilirsiniz."
+                                               TextWrapping="Wrap"
+                                               Foreground="{DynamicResource AppMutedForegroundBrush}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ProjectHealthItems.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Grid.Row="2"
+                            Style="{StaticResource AccentCardBorderStyle}"
+                            Margin="6"
+                            Padding="10"
+                            CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Status}"
+                                       Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                            <TextBlock Text="Uygulama son projeyi ve otomatik yedeği hatırlar. Kaydedilmemiş değişikliklerde çıkışta uyarı verir."
+                                       Margin="0,6,0,0"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Şablon" Content="{Binding TemplateVm}" />
+            <TabItem Header="Hoca–Ders" Content="{Binding AssignmentsVm}" />
+            <TabItem Header="Öğretmenler" Content="{Binding TeachersVm}" />
+            <TabItem Header="Öğrenciler">
+                <views:StudentsView />
+            </TabItem>
+            <TabItem Header="Sınav Karma">
+                <views:ExamShuffleView />
+            </TabItem>
+            <!-- Excel Giriş sekmesi şimdilik devre dışı -->
+            <!--<TabItem Header="Excel Giriş" Content="{Binding ImportVm}" />-->
+            <TabItem Header="Ayarlar">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <GroupBox Header="Program Oluşturma Kuralları" Margin="0,0,10,12">
+                            <StackPanel Margin="8">
+                                <CheckBox Content="Öğretmenlerin uygun olmadığı günleri dikkate al"
+                                          IsChecked="{Binding Store.RespectTeacherUnavailableDays}"/>
+                                <CheckBox Content="Sınıf saat kurallarına bak"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.RespectGroupSlotRules}"/>
+                                <CheckBox Content="Öğle arası saatlerine ders koyma"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.RespectLunchBreak}"/>
+                                <CheckBox Content="Hoca yarım gün müsaitliğine bak"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.RespectTeacherHalfDay}"/>
+                                <CheckBox Content="Hoca nöbet günlerini yerleştirmede öne al"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseDutyDayPriority}"/>
+                                <CheckBox Content="Ders öncelik derecesini kullan"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseCoursePriorityLevel}"/>
+                                <CheckBox Content="Hoca ders istek/istememe tercihlerini kullan"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseTeacherCoursePreferences}"/>
+                                <CheckBox Content="Ayrıntılı öğretmen uygunluk listesini kullan"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseDetailedTeacherAvailability}"/>
+                                <CheckBox Content="Dersleri günlere yay kuralını kullan"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseSpreadAcrossDays}"/>
+                                <CheckBox Content="Günlük ders maksimumuna bak"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseMaxPerDay}"/>
+                                <CheckBox Content="Blok dersleri mümkün olduğunca bölme"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.KeepBlocksStrict}"/>
+                                <CheckBox Content="İkinci Öğretimi Etkinleştir (yakında)"
+                                          Margin="0,12,0,0"
+                                          IsEnabled="False"
+                                          ToolTip="Yer tutucu: ikinci öğretim/öğlenci program desteği henüz uygulanmadı"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Grid.Column="1" Header="Arama Derinliği" Margin="10,0,0,12">
+                            <StackPanel Margin="8">
+                                <TextBlock Text="Arama Stratejisi" Margin="0,0,0,4"/>
+                                <ComboBox ItemsSource="{Binding SearchStrategyChoices}"
+                                          SelectedItem="{Binding Store.SearchStrategy}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource EnumDisplay}}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <CheckBox Content="Ayrıntılı arama kullan"
+                                          Margin="0,10,0,0"
+                                          IsChecked="{Binding Store.DeepSearchEnabled}"/>
+                                <CheckBox Content="Parça parça yoğun yerleştirme yap"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseIntensiveRepairSearch}"/>
+                                <CheckBox Content="Sınıf sınıf sırayla yerleştir"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseClassByClassPlacement}"/>
+                                <CheckBox Content="Önce yerleştir, sonra yavaş yavaş düzelt"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseProgressiveImprovement}"/>
+                                <CheckBox Content="Çok çekirdekli arama kullan"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding Store.UseParallelSearch}"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <CheckBox Content="Günde en az"
+                                              VerticalAlignment="Center"
+                                              IsChecked="{Binding Store.PreferMinimumVerbalPerDay}"/>
+                                    <TextBox Text="{Binding Store.MinimumVerbalPerDay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="42"
+                                             Margin="8,0,8,0"/>
+                                    <TextBlock Text="adet sözel ders olsun"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <CheckBox Content="Günde en az"
+                                              VerticalAlignment="Center"
+                                              IsChecked="{Binding Store.PreferMinimumNumericPerDay}"/>
+                                    <TextBox Text="{Binding Store.MinimumNumericPerDay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="42"
+                                             Margin="8,0,8,0"/>
+                                    <TextBlock Text="adet sayısal ders olsun"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBlock Text="En fazla deneme"
+                                               Width="130"
+                                               VerticalAlignment="Center"/>
+                                    <TextBox Text="{Binding Store.MaxGenerationAttempts, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="70"/>
+                                </StackPanel>
+                                <CheckBox Content="Aynı öğretmenin dersleri art arda gelmesin"
+                                          Margin="0,12,0,0"
+                                          IsChecked="{Binding SchedulerVm.AvoidConsecutiveTeacherLessons}"/>
+                                <CheckBox Content="Aynı öğretmenin derslerini günlere dengeli dağıt"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding SchedulerVm.BalanceTeacherAcrossDays}"/>
+                                <CheckBox Content="Program oluştururken rastgele denemeler yap"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding SchedulerVm.RandomizePlacement}"/>
+                                <CheckBox Content="Salonları rastgele ata"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding RandomizeRooms}"/>
+                                <CheckBox Content="Dersleri mümkünse sabah yap"
+                                          Margin="0,6,0,0"
+                                          IsChecked="{Binding PreferMorning}"/>
+                                <Separator Margin="0,14,0,10"/>
+                                <TextBlock Text="Salon Yönetimi"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                                <TextBlock Text="Yeni oluşturulacak salonların varsayılan kapasitesi"
+                                           Margin="0,7,0,4"
+                                           Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Text="{Binding Store.DefaultRoomCapacity, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="70"
+                                             ToolTip="0 ile 10000 arasında bir kapasite yazın."/>
+                                    <TextBlock Text="kişi"
+                                               Margin="8,0,0,0"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Button Content="Her sınıf/şube için aynı adlı salon oluştur"
+                                        Margin="0,8,0,0"
+                                        Padding="10,5"
+                                        HorizontalAlignment="Left"
+                                        Command="{Binding CreateRoomsForGroupsCommand}"
+                                        ToolTip="Mevcut her sınıf/şube için aynı isimle eksik salonları ekler ve sınıfın salonunu bu adla eşleştirir."/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Grid.Row="1" Grid.ColumnSpan="2" Header="Yerleştirilemezse Devre Dışı Bırakma Sırası">
+                            <DockPanel>
+                                <CheckBox Content="Yerleştirilemezse kuralları sırayla gevşet"
+                                          DockPanel.Dock="Top"
+                                          Margin="8,8,8,0"
+                                          IsChecked="{Binding Store.UseRelaxationOrder}"/>
+                                <DataGrid ItemsSource="{Binding RelaxationRules}"
+                                          DataContext="{Binding SchedulerVm}"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          AllowDrop="True"
+                                          IsEnabled="{Binding DataContext.Store.UseRelaxationOrder, RelativeSource={RelativeSource AncestorType=Window}}"
+                                          PreviewMouseMove="RelaxationRulesGrid_PreviewMouseMove"
+                                          Drop="RelaxationRulesGrid_Drop"
+                                          Margin="8"
+                                          Height="280">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Sıra"
+                                                            Binding="{Binding Order, UpdateSourceTrigger=PropertyChanged}"
+                                                            Width="80"/>
+                                        <DataGridTextColumn Header="Kural"
+                                                            Binding="{Binding Label}"
+                                                            IsReadOnly="True"
+                                                            Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </GroupBox>
+
+                        <GroupBox Grid.Row="2" Grid.ColumnSpan="2" Header="Sayısal/Sözel Saat Kaçınma Kuralları" Margin="0,12,0,0">
+                            <DataGrid ItemsSource="{Binding Store.CourseKindSlotRules}"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="True"
+                                      Margin="8"
+                                      Height="220">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Sınıf" Width="180">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Group.Name}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.Store.Groups, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          SelectedItem="{Binding Group, UpdateSourceTrigger=PropertyChanged}"
+                                                          DisplayMemberPath="Name"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Gün" Width="150">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Day.Name}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.Store.Days, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          SelectedItem="{Binding Day, UpdateSourceTrigger=PropertyChanged}"
+                                                          DisplayMemberPath="Name"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Ders saati" Binding="{Binding SlotIndex, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                    <DataGridTemplateColumn Header="Koymamaya çalış" Width="150">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Kind, Converter={StaticResource EnumDisplay}}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding DataContext.CourseKinds, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          SelectedItem="{Binding Kind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding Converter={StaticResource EnumDisplay}}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </GroupBox>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Program" Content="{Binding SchedulerVm}" />
+        </TabControl>
+    </DockPanel>
+</Window>

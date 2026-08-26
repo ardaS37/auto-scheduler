@@ -1,0 +1,34 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+publish/
+artifacts/
+TestResults/
+*.pdb
+
+# Visual Studio and local user settings
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Signing and Store packaging
+*.pfx
+*.snk
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+*.appinstaller
+Package.appxmanifest
+AppxManifest.xml
+
+# Local data and logs
+*.autoscheduler.json
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

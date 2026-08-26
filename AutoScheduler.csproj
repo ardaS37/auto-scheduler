@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>AutoScheduler</RootNamespace>
+    <AssemblyName>AutoScheduler</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Deterministic>true</Deterministic>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+
+    <Platforms>x86;x64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+    <SelfContained>true</SelfContained>
+    <SatelliteResourceLanguages>tr;en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Unused legacy ApplicationSettingsBase/ResourceManager designer code; not ported, kept on disk unmodified -->
+    <Compile Remove="Properties\Resources.Designer.cs" />
+    <Compile Remove="Properties\Settings.Designer.cs" />
+    <EmbeddedResource Remove="Properties\Resources.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Windows referenced via pack://application:,,,/Assets/icon.ico need it embedded as a WPF resource -->
+    <Resource Include="Assets\icon.ico" />
+  </ItemGroup>
+
+  <!--
+    Publish/RAR pre-creates a resource-culture folder per culture known across the whole
+    dependency graph (WPF runtime pack, Newtonsoft.Json, etc.), even though SatelliteResourceLanguages
+    already correctly limits which ones get files copied into them. The rest are left behind as
+    empty clutter. UI is Turkish-only, so remove every culture folder except tr.
+  -->
+  <Target Name="RemoveExtraCultureResourceDirsAfterPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_ExtraCultureDirs Include="$(PublishDir)cs\;$(PublishDir)de\;$(PublishDir)es\;$(PublishDir)fr\;$(PublishDir)it\;$(PublishDir)ja\;$(PublishDir)ko\;$(PublishDir)pl\;$(PublishDir)pt-BR\;$(PublishDir)ru\;$(PublishDir)zh-Hans\;$(PublishDir)zh-Hant\" />
+    </ItemGroup>
+    <RemoveDir Directories="@(_ExtraCultureDirs)" Condition="Exists('%(_ExtraCultureDirs.Identity)')" />
+  </Target>
+
+</Project>

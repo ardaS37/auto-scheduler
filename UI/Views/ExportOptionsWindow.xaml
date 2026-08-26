@@ -1,0 +1,123 @@
+<Window x:Class="AutoScheduler.UI.Views.ExportOptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Dışa Aktarım"
+        Height="520"
+        Width="560"
+        MinHeight="480"
+        MinWidth="520"
+        Icon="pack://application:,,,/Assets/icon.ico"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <Border Background="{DynamicResource AppBackgroundBrush}" Padding="18">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="Dışa Aktarım Seçenekleri"
+                           FontSize="24"
+                           FontWeight="Black"
+                           Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                <TextBlock Text="İçeriği, biçimi ve paketleme yöntemini seçin."
+                           Margin="0,6,0,16"
+                           Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <GroupBox Header="Hangi içerik dışa aktarılacak?"
+                          Margin="0,0,10,12"
+                          Padding="10">
+                    <StackPanel>
+                        <RadioButton x:Name="ActiveBlanketRadio"
+                                     Content="Açık çarşaf görünümü"
+                                     Margin="0,0,0,8"/>
+                        <RadioButton x:Name="SelectedTeacherRadio"
+                                     Content="Seçili öğretmen programı"
+                                     Margin="0,0,0,8"/>
+                        <RadioButton x:Name="AllTeachersRadio"
+                                     Content="Tüm öğretmen programları"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Grid.Column="1"
+                          Header="Format"
+                          Margin="10,0,0,12"
+                          Padding="10">
+                    <StackPanel>
+                        <RadioButton x:Name="CsvRadio"
+                                     Content="Excel CSV"
+                                     Margin="0,0,0,8"/>
+                        <RadioButton x:Name="PdfRadio"
+                                     Content="PDF"/>
+                        <CheckBox x:Name="ColorCheck"
+                                  Content="Renkli PDF"
+                                  IsChecked="True"
+                                  Margin="0,18,0,0"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Grid.Row="1"
+                          Grid.ColumnSpan="2"
+                          Header="Paketleme"
+                          Padding="10"
+                          Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton x:Name="SingleFileRadio"
+                                     Content="Tek dosya"
+                                     Margin="0,0,24,0"/>
+                        <RadioButton x:Name="FolderRadio"
+                                     Content="Klasöre ayrı dosyalar"
+                                     Margin="0,0,24,0"/>
+                        <RadioButton x:Name="ZipRadio"
+                                     Content="ZIP içinde ayrı dosyalar"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Grid.Row="2"
+                          Grid.ColumnSpan="2"
+                          Header="Öğretmen"
+                          Padding="10">
+                    <StackPanel>
+                        <ComboBox x:Name="TeacherBox"
+                                  DisplayMemberPath="Name"
+                                  Height="30"/>
+                        <TextBlock Text="Seçili öğretmen seçeneği için kullanılır. Tüm öğretmenlerde bu alan yok sayılır."
+                                   Margin="0,8,0,0"
+                                   Foreground="{DynamicResource AppMutedForegroundBrush}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,16,0,0">
+                <Button Content="Vazgeç"
+                        Width="96"
+                        Height="32"
+                        Margin="0,0,8,0"
+                        IsCancel="True"/>
+                <Button Content="Dışa Aktar"
+                        Width="112"
+                        Height="32"
+                        IsDefault="True"
+                        Click="Export_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

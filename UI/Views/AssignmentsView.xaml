@@ -1,0 +1,385 @@
+﻿<UserControl x:Class="AutoScheduler.UI.Views.AssignmentsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:uiConverters="clr-namespace:AutoScheduler.UI.Converters">
+
+    <UserControl.Resources>
+        <!-- Highlight for quick-assign selections -->
+        <Style x:Key="QuickAssignListBoxItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="2"/>
+            <Setter Property="Margin" Value="0,1,0,1"/>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True"/>
+                        <Condition Binding="{Binding DataContext.QuickAssignMode, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="{DynamicResource AppHighlightBackgroundBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource AppHighlightBorderBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="230"/>
+            <ColumnDefinition Width="230"/>
+            <ColumnDefinition Width="190"/>
+            <ColumnDefinition Width="*" MinWidth="760"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- SOL: Öğretmenler -->
+        <DockPanel Grid.Column="0" Margin="0,0,10,0">
+            <TextBlock DockPanel.Dock="Top" Style="{StaticResource SectionHeaderTextStyle}"
+                       Text="Öğretmenler"/>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Style="{StaticResource IconButtonStyle}" Content="+" Command="{Binding AddTeacherCommand}" ToolTip="Yeni öğretmen ekle"/>
+                <Button Style="{StaticResource IconButtonStyle}" Content="-" Margin="6,0,0,0" Command="{Binding RemoveTeacherCommand}" ToolTip="Seçili öğretmeni sil"/>
+                <Button Content="Ayrıntılar..." Margin="12,0,0,0" Click="TeacherDetails_Click" ToolTip="Seçili öğretmenin ders tercihlerini ve uygunluk bilgilerini düzenle"/>
+            </StackPanel>
+            <TextBlock DockPanel.Dock="Top"
+                       Text="Henüz öğretmen eklenmedi."
+                       Foreground="{DynamicResource AppMutedForegroundBrush}"
+                       Margin="4,8,4,0"
+                       HorizontalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Teachers.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <ListBox ItemsSource="{Binding Teachers}"
+                     SelectedItem="{Binding SelectedTeacher}"
+                     DisplayMemberPath="Name"
+                     ItemContainerStyle="{StaticResource QuickAssignListBoxItemStyle}"
+                     MouseDoubleClick="TeachersList_MouseDoubleClick"/>
+        </DockPanel>
+
+        <!-- ORTA: Dersler -->
+        <DockPanel Grid.Column="1" Margin="0,0,10,0">
+            <TextBlock DockPanel.Dock="Top" Style="{StaticResource SectionHeaderTextStyle}"
+                       Text="Dersler"/>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Style="{StaticResource IconButtonStyle}" Content="+" Command="{Binding AddCourseCommand}" ToolTip="Yeni ders ekle"/>
+                <Button Style="{StaticResource IconButtonStyle}" Content="-" Margin="6,0,0,0" Command="{Binding RemoveCourseCommand}" ToolTip="Seçili dersi sil"/>
+            </StackPanel>
+
+            <TextBlock DockPanel.Dock="Top"
+                       Text="Henüz ders eklenmedi."
+                       Foreground="{DynamicResource AppMutedForegroundBrush}"
+                       Margin="4,8,4,0"
+                       HorizontalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Courses.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <!-- Seçili ders ayarları -->
+            <StackPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
+                <TextBlock Text="Ders ayarları" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <TextBlock Text="Ders kodu" FontSize="11" Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                <TextBox Text="{Binding SelectedCourse.Code, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,2,0,6"
+                         ToolTip="Çarşaf ve exportlarda kullanılacak kısa ders kodu. Örn: MAT, FİZ, TAR"/>
+                <CheckBox Content="Öncelikli sınıflar için öncelikli"
+                          IsChecked="{Binding SelectedCourse.IsPriority, Mode=TwoWay}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="Genel öncelik" FontSize="11" Foreground="{DynamicResource AppMutedForegroundBrush}" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding SelectedCourse.PriorityLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Width="44"
+                             Margin="8,0,0,0"
+                             ToolTip="5 en yüksek önceliktir; ders mümkün olduğunca sabah saatlerine çekilir."/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="Tür" FontSize="11" Foreground="{DynamicResource AppMutedForegroundBrush}" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding CourseKinds}"
+                              SelectedItem="{Binding SelectedCourse.Kind, Mode=TwoWay}"
+                              Width="110"
+                              Margin="8,0,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- ListBox kalan alanı doldursun -->
+            <ListBox ItemsSource="{Binding Courses}"
+                     SelectedItem="{Binding SelectedCourse}"
+                     ItemContainerStyle="{StaticResource QuickAssignListBoxItemStyle}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <Border Background="{DynamicResource AppInfoSoftBackgroundBrush}"
+                                        BorderBrush="{DynamicResource AppInfoSoftBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="5,1"
+                                        Margin="0,0,6,0">
+                                    <TextBlock Text="{Binding Code}"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource AppInfoBrush}"/>
+                                </Border>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="64"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}"
+                                         Margin="0,0,6,0"
+                                         ToolTip="Kod"/>
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                         VerticalAlignment="Center"/>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+
+        <!-- SALONLAR -->
+        <DockPanel Grid.Column="2" Margin="0,0,10,0">
+            <TextBlock DockPanel.Dock="Top" Style="{StaticResource SectionHeaderTextStyle}"
+                       Text="Salonlar"/>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Style="{StaticResource IconButtonStyle}" Content="+" Command="{Binding AddRoomCommand}" ToolTip="Yeni salon ekle"/>
+                <Button Style="{StaticResource IconButtonStyle}" Content="-" Margin="6,0,0,0" Command="{Binding RemoveRoomCommand}" ToolTip="Seçili salonu sil"/>
+            </StackPanel>
+            <TextBlock DockPanel.Dock="Top"
+                       Text="Henüz salon eklenmedi."
+                       Foreground="{DynamicResource AppMutedForegroundBrush}"
+                       Margin="4,8,4,0"
+                       HorizontalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Rooms.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <DataGrid ItemsSource="{Binding Rooms}"
+                      SelectedItem="{Binding SelectedRoom}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                    <Condition Binding="{Binding DataContext.QuickAssignMode, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="{DynamicResource AppHighlightBackgroundBrush}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource AppHighlightBorderBrush}" />
+                                <Setter Property="BorderThickness" Value="1" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ad" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Kapasite"
+                                        Binding="{Binding Capacity, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="80">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="Kapasiteyi değiştirmek için hücreye çift tıklayın."/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+
+        <!-- SAĞ: Sınıf seç + Atamalar -->
+        <DockPanel Grid.Column="3">
+            <Border DockPanel.Dock="Top"
+                    Style="{StaticResource CardBorderStyle}"
+                    CornerRadius="10"
+                    Padding="12"
+                    Margin="0,0,0,10"
+                    Effect="{StaticResource CardShadowEffect}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="190"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Sınıf"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0"/>
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding Groups}"
+                              SelectedItem="{Binding SelectedGroup}"
+                              DisplayMemberPath="Name"/>
+                    <Button Grid.Column="2"
+                            Content="Atama Ekle"
+                            Margin="14,0,0,0"
+                            Click="AddAssignment_Click"
+                            ToolTip="Seçili sınıfa yeni hoca-ders ataması ekle"/>
+                    <Button Grid.Column="3"
+                            Content="Sil"
+                            Margin="6,0,0,0"
+                            Click="RemoveAssignment_Click"
+                            ToolTip="Seçili atamayı sil"/>
+                    <StackPanel Grid.Column="4"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                        <Button Content="Toplu Veri Girişi..."
+                                Margin="0,0,10,0"
+                                Click="OpenBulkAssignments_Click"
+                                ToolTip="Bir dersi birden çok sınıfa tek seferde ekleyin veya satır bazlı toplu veri yapıştırın"/>
+                        <CheckBox
+                              Content="Hızlı ata"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding QuickAssignMode}"
+                              ToolTip="Açıkken: solda seçtiğin Ders/Hoca/Salon, sağdaki seçili atamaya tıklayınca otomatik atanır."/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border DockPanel.Dock="Bottom"
+                    Style="{StaticResource AccentCardBorderStyle}"
+                    Margin="0,10,0,0"
+                    Padding="10">
+                <TextBlock Text="Aynı dersi çok sayıda sınıfa eklemeniz gerekiyorsa 'Toplu Veri Girişi...' aracını kullanabilirsiniz."
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource AppAccentStrongBrush}"/>
+            </Border>
+
+            <DataGrid x:Name="AssignmentsGrid"
+                      ItemsSource="{Binding GroupAssignments}"
+                      SelectedItem="{Binding SelectedAssignment}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      SelectionChanged="DataGrid_SelectionChanged"
+                      PreviewMouseLeftButtonUp="AssignmentsGrid_PreviewMouseLeftButtonUp"
+                      HorizontalScrollBarVisibility="Auto"
+                      EnableColumnVirtualization="False">
+                <DataGrid.Columns>
+
+                    <!-- Ders -->
+                    <DataGridTemplateColumn Header="Ders" Width="1.4*" MinWidth="110">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Course.Name}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding DataContext.Courses, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                          SelectedItem="{Binding Course, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMemberPath="Name"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Öğretmen -->
+                    <DataGridTemplateColumn Header="Öğretmen" Width="1.4*" MinWidth="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Teacher.Name}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding AvailableTeachers}"
+                                          SelectedItem="{Binding Teacher, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMemberPath="Name"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Haftalık Saat -->
+                    <DataGridTextColumn Header="Haftalık Saat"
+                                        Binding="{Binding WeeklyHours, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="120"
+                                        MinWidth="120"/>
+
+                    <!-- Blok -->
+                    <DataGridTextColumn Header="Blok"
+                                        Binding="{Binding BlockSize, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="70"
+                                        MinWidth="70"/>
+
+                    <!-- K12: dağılım -->
+                    <DataGridCheckBoxColumn Header="Günlere yay"
+                                             Binding="{Binding SpreadAcrossDays, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="110"
+                                             MinWidth="110"/>
+                    <DataGridTextColumn Header="Günlük max"
+                                        Binding="{Binding MaxPerDay, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="95"
+                                        MinWidth="95"/>
+
+                    <!-- Salon -->
+                    <DataGridTemplateColumn Header="Salon" Width="130" MinWidth="110">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Room.Name}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding DataContext.Rooms, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                         SelectedItem="{Binding Room, UpdateSourceTrigger=PropertyChanged}"
+                                         DisplayMemberPath="Name"
+                                         IsEnabled="{Binding DataContext.IsRoomEditingEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+
+        </DockPanel>
+    </Grid>
+</UserControl>

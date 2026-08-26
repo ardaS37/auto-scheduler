@@ -1,0 +1,106 @@
+﻿<Window x:Class="AutoScheduler.UI.Views.SetupWizardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Yeni Proje Rehberi"
+        Width="640"
+        Height="560"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Style="{StaticResource AccentCardBorderStyle}"
+                        CornerRadius="14"
+                        Padding="16"
+                        Effect="{StaticResource CardShadowEffect}">
+                    <StackPanel>
+                        <TextBlock Text="Yeni proje rehberi"
+                                   FontSize="28"
+                                   FontWeight="Black"
+                                   Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                        <TextBlock Text="Tek adımda birleşik özellik seti, standart hafta yapısı ve başlangıç sınıflarını oluşturalım."
+                                   Margin="0,8,0,0"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <GroupBox Header="1. Proje Bilgisi" Margin="0,14,0,0">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Proje adı"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                        <TextBox x:Name="ProjectNameTextBox"
+                                 Grid.Column="1"
+                                 Text="Yeni Proje"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="2. Hazır Okul Şablonu" Margin="0,14,0,0">
+                    <StackPanel Margin="8">
+                        <TextBlock Text="Bir şablon seçtiğinizde 5 gün ve 8 ders saati (İlkokul'da 6 ders saati) otomatik hazırlanır."
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                        <UniformGrid Columns="4" Margin="0,10,0,0">
+                            <Button Content="İlkokul" Margin="0,0,8,0" Click="Preset_Click" Tag="Ilkokul"/>
+                            <Button Content="Ortaokul" Margin="0,0,8,0" Click="Preset_Click" Tag="Ortaokul"/>
+                            <Button Content="Lise" Margin="0,0,8,0" Click="Preset_Click" Tag="Lise"/>
+                            <Button Content="Üniversite" Click="Preset_Click" Tag="Universite"/>
+                        </UniformGrid>
+                        <Border Style="{StaticResource CardBorderStyle}" Margin="0,10,0,0">
+                            <TextBlock x:Name="PresetSummaryText"
+                                       Text="Varsayılan: Lise"
+                                       Foreground="{DynamicResource AppAccentStrongBrush}"
+                                       FontWeight="SemiBold"/>
+                        </Border>
+                        <CheckBox x:Name="SecondShiftCheckBox"
+                                  Content="İkinci Öğretimi Etkinleştir (yakında)"
+                                  Margin="0,12,0,0"
+                                  IsEnabled="False"
+                                  ToolTip="Yer tutucu: ikinci öğretim/öğlenci program desteği henüz uygulanmadı"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="3. Başlangıç Sınıfları" Margin="0,14,0,0">
+                    <Grid Margin="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="140"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Her satıra bir sınıf yazın. Örnek: 9-A, 9-B, 10-A"
+                                   Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                        <TextBox x:Name="GroupsTextBox"
+                                 Grid.Row="1"
+                                 Margin="0,10,0,0"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Text="9-A&#10;9-B&#10;10-A"/>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0">
+            <Button Content="Vazgeç" Width="110" Click="Cancel_Click"/>
+            <Button Content="Projeyi Hazırla"
+                    Width="150"
+                    Margin="8,0,0,0"
+                    IsDefault="True"
+                    Background="{DynamicResource AppAccentSoftBackgroundBrush}"
+                    BorderBrush="{DynamicResource AppAccentSoftBorderBrush}"
+                    Click="Apply_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,167 @@
+﻿<Window x:Class="AutoScheduler.UI.Views.BulkAssignmentsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Toplu Veri Girişi"
+        Width="980"
+        Height="700"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource AccentCardBorderStyle}"
+                CornerRadius="14"
+                Padding="16"
+                Effect="{StaticResource CardShadowEffect}">
+            <StackPanel>
+                <TextBlock Text="Toplu Veri Girişi"
+                           FontSize="28"
+                           FontWeight="Black"
+                           Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                <TextBlock Text="İki yöntem sunulmaktadır: solda bir dersi birden çok sınıfa tek seferde ekleyebilir, sağda satır bazlı toplu veri yapıştırabilirsiniz."
+                           Margin="0,8,0,0"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="0,14,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.05*"/>
+                <ColumnDefinition Width="0.95*"/>
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Header="Birden Çok Sınıfa Toplu Atama" Margin="0,0,10,0">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="130"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Ders" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="1"
+                              x:Name="CourseComboBox"
+                              DisplayMemberPath="Name"/>
+
+                    <TextBlock Grid.Row="1" Text="Öğretmen" VerticalAlignment="Center" Margin="0,10,0,0"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1"
+                              x:Name="TeacherComboBox"
+                              DisplayMemberPath="Name"
+                              Margin="0,10,0,0"/>
+
+                    <TextBlock Grid.Row="2" Text="Salon" VerticalAlignment="Center" Margin="0,10,0,0"/>
+                    <ComboBox Grid.Row="2" Grid.Column="1"
+                              x:Name="RoomComboBox"
+                              DisplayMemberPath="Name"
+                              Margin="0,10,0,0"/>
+
+                    <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,10,0,0">
+                        <TextBlock Text="Haftalık saat" VerticalAlignment="Center"/>
+                        <TextBox x:Name="WeeklyHoursTextBox" Width="50" Margin="8,0,16,0" Text="2"/>
+                        <TextBlock Text="Blok" VerticalAlignment="Center"/>
+                        <TextBox x:Name="BlockSizeTextBox" Width="50" Margin="8,0,16,0" Text="1"/>
+                        <CheckBox x:Name="SpreadAcrossDaysCheckBox"
+                                  Content="Günlere yay"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,12,0"
+                                  IsChecked="True"/>
+                        <TextBlock Text="Günlük max" VerticalAlignment="Center"/>
+                        <TextBox x:Name="MaxPerDayTextBox" Width="50" Margin="8,0,0,0" Text="1"/>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="4"
+                               Grid.ColumnSpan="2"
+                               Text="Sınıflar"
+                               Margin="0,14,0,6"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+
+                    <ListBox Grid.Row="5"
+                             Grid.ColumnSpan="2"
+                             x:Name="GroupsListBox"
+                             SelectionMode="Extended"
+                             DisplayMemberPath="Name"/>
+
+                    <StackPanel Grid.Row="6"
+                                Grid.ColumnSpan="2"
+                                Orientation="Horizontal"
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Right">
+                        <Button Content="Seçili Sınıflara Uygula"
+                                Width="170"
+                                Click="ApplyBatch_Click"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Grid.Column="1" Header="Satır Bazlı Toplu Veri Girişi">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="160"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Biçim: Sınıf;Ders;Öğretmen;HaftalıkSaat;Blok;GünlükMax;Salon"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                    <TextBox Grid.Row="1"
+                             x:Name="BulkTextBox"
+                             Margin="0,10,0,0"
+                             AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto"
+                             Text="9-A;Matematik;Ayşe Yılmaz;4;1;2;&#10;9-B;Matematik;Ayşe Yılmaz;4;1;2"/>
+                    <StackPanel Grid.Row="2" Margin="0,10,0,0">
+                        <TextBlock Text="Salon alanı opsiyoneldir. Boş bırakabilirsiniz. ';' veya ',' ya da tab ile ayrılmış satırlar kabul edilir."
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                        <WrapPanel Margin="0,10,0,0">
+                            <CheckBox x:Name="AutoCreateGroupsCheckBox" Content="Eksik sınıfı oluştur" Margin="0,0,12,0"/>
+                            <CheckBox x:Name="AutoCreateCoursesCheckBox" Content="Eksik dersi oluştur" Margin="0,0,12,0"/>
+                            <CheckBox x:Name="AutoCreateTeachersCheckBox" Content="Eksik öğretmeni oluştur" Margin="0,0,12,0"/>
+                            <CheckBox x:Name="AutoCreateRoomsCheckBox" Content="Eksik salonu oluştur"/>
+                        </WrapPanel>
+                    </StackPanel>
+                    <StackPanel Grid.Row="3"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="0,10,0,0">
+                        <Button Content="Örnek Veri Yerleştir"
+                                Width="110"
+                                Margin="0,0,8,0"
+                                Click="FillSample_Click"/>
+                        <Button Content="Satırları İçeri Aktar"
+                                Width="140"
+                                Click="ImportLines_Click"/>
+                    </StackPanel>
+                    <GroupBox Grid.Row="4" Header="Sorunlu Satırlar" Margin="0,12,0,0">
+                        <ListBox x:Name="ErrorsListBox"/>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Margin="0,14,0,0"
+                Style="{StaticResource CardBorderStyle}"
+                Padding="10">
+            <TextBlock x:Name="StatusTextBlock"
+                       Text="İşlem bekleniyor."
+                       Foreground="{DynamicResource AppAccentStrongBrush}"/>
+        </Border>
+    </Grid>
+</Window>

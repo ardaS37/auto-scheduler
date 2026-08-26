@@ -1,0 +1,134 @@
+﻿<Window x:Class="AutoScheduler.UI.Views.WelcomeTutorialWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hoş Geldiniz"
+        Width="760"
+        Height="620"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource AccentCardBorderStyle}"
+                CornerRadius="16"
+                Padding="18"
+                Effect="{StaticResource CardShadowEffect}">
+            <StackPanel>
+                <TextBlock Text="AutoScheduler - Ders Programı Hazırlayıcı"
+                           FontSize="30"
+                           FontWeight="Black"
+                           Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                <TextBlock Text="İlk kullanım için kısa bir tur: hangi ekranda ne yapacağınızı 1 dakikada özetleyelim."
+                           Margin="0,8,0,0"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+            </StackPanel>
+        </Border>
+
+        <UniformGrid Grid.Row="1" Columns="4" Margin="0,14,0,0">
+            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,8,0">
+                <StackPanel>
+                    <TextBlock Text="1. Şablon"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    <TextBlock Text="Önce günleri, 8 ders saatini ve sınıfları hazırlayın. İsterseniz standart 5 gün / 8 ders şablonunu kullanın."
+                               Margin="0,8,0,0"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,8,0">
+                <StackPanel>
+                    <TextBlock Text="2. Öğretmen ve Dersler"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    <TextBlock Text="Öğretmen, ders ve salonları ekleyin. Tek tek girmek yerine toplu giriş aracıyla çoklu atama yapabilirsiniz."
+                               Margin="0,8,0,0"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,8,0">
+                <StackPanel>
+                    <TextBlock Text="3. Program"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    <TextBlock Text="Program üretin, alternatifleri gezin ve uyarı panelindeki önerilere göre veri veya ayar düzeltin."
+                               Margin="0,8,0,0"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="4. Çarşaf ve Dışa Aktarım"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    <TextBlock Text="Sonuçları öğretmen ve sınıf bazında inceleyin, sonra CSV veya PDF export alın."
+                               Margin="0,8,0,0"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <Grid Grid.Row="2" Margin="0,14,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="0.8*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="İlk iş için öneri"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    <TextBlock Text="Hiç veri yoksa önce Yeni Proje Rehberi'ni açın. Rehber; okul türünü, 5 gün / 8 ders saatini ve başlangıç sınıflarını otomatik kurar."
+                               Margin="0,10,0,0"
+                               TextWrapping="Wrap"/>
+                    <TextBlock Text="Bir sonraki hızlı adım, Öğretmen ve Dersler ekranındaki toplu veri girişi aracıyla aynı dersi birden çok sınıfa tek seferde eklemektir."
+                               Margin="0,10,0,0"
+                               TextWrapping="Wrap"/>
+                    <TextBlock Text="Ana menüdeki Proje Hazırlık Durumu kartı, eksikleri adım adım gösterecektir."
+                               Margin="0,10,0,0"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource AccentCardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="Kısayollar"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    <TextBlock Text="Ctrl+S: Projeyi kaydet"
+                               Margin="0,10,0,0"/>
+                    <TextBlock Text="Ctrl+O: Proje yükle"
+                               Margin="0,6,0,0"/>
+                    <TextBlock Text="Son projeler ve otomatik yedekler açılışta hatırlanır."
+                               Margin="0,10,0,0"
+                               TextWrapping="Wrap"/>
+                    <CheckBox x:Name="DontShowAgainCheckBox"
+                              Content="Bu öğreticiyi bir daha otomatik gösterme"
+                              Margin="0,16,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0">
+            <Button Content="Yeni Proje Rehberi"
+                    Width="150"
+                    Click="OpenWizard_Click"/>
+            <Button Content="Turu Bitir"
+                    Width="120"
+                    Margin="8,0,0,0"
+                    IsDefault="True"
+                    Click="Close_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

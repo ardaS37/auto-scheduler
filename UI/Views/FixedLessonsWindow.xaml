@@ -1,0 +1,144 @@
+<Window x:Class="AutoScheduler.UI.Views.FixedLessonsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sabit Dersler"
+        Height="560"
+        Width="1080"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="Ekle" Width="90" Click="Add_Click" ToolTip="Yeni sabit ders ekle"/>
+            <Button Content="Sil" Width="90" Margin="8,0,0,0" Click="Remove_Click" ToolTip="Seçili sabit dersi sil"/>
+            <TextBlock Text="Bu dersler program oluştururken önce yerleştirilir." Margin="16,3,0,0" Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+        </StackPanel>
+
+        <TextBlock Grid.Row="1"
+                   Text="Henüz sabit ders eklenmedi. Başlamak için &quot;Ekle&quot; butonunu kullanın."
+                   Foreground="{DynamicResource AppMutedForegroundBrush}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Margin="0,24,0,0"
+                   Panel.ZIndex="1">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Store.FixedLessons.Count}" Value="0">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <DataGrid x:Name="FixedGrid" Grid.Row="1"
+                  ItemsSource="{Binding Store.FixedLessons}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  SelectionUnit="FullRow"
+                  SelectionMode="Single">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource AppAccentSoftBackgroundBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource AppForegroundBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <!-- DataGridComboBoxColumn binding is flaky for ItemsSource; use TemplateColumns -->
+
+                <DataGridTemplateColumn Header="Sınıf" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Group.Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding DataContext.Store.Groups, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedItem="{Binding Group, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="Name"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Gün" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Day.Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding DataContext.Store.Days, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedItem="{Binding Day, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="Name"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Ders Saati" Width="80" Binding="{Binding SlotIndex}"/>
+
+                <DataGridTemplateColumn Header="Ders" Width="160">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Course.Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding DataContext.Store.Courses, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedItem="{Binding Course, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="Name"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Hoca" Width="160">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Teacher.Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding DataContext.Store.Teachers, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedItem="{Binding Teacher, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="Name"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Salon" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Room.Name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding DataContext.Store.Rooms, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedItem="{Binding Room, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="Name"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Blok" Width="60" Binding="{Binding BlockSize}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button Content="Kapat" Width="90" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

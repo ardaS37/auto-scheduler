@@ -1,0 +1,79 @@
+<Window x:Class="AutoScheduler.UI.Views.ClassGroupEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:uiConverters="clr-namespace:AutoScheduler.UI.Converters"
+        Title="Sınıf Özellikleri"
+        Height="630"
+        Width="560"
+        MinHeight="500"
+        MinWidth="500"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <uiConverters:EnumDisplayConverter x:Key="EnumDisplay" />
+    </Window.Resources>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Sınıf adı:" Width="110" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding Group.Name, UpdateSourceTrigger=PropertyChanged}" Width="360"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Alan:" Width="110" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding Tracks}" SelectedItem="{Binding Group.Track}" Width="180">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate><TextBlock Text="{Binding Converter={StaticResource EnumDisplay}}"/></DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Sınıf düzeyi:" Width="110" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding Group.GradeLevel, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Şube kodu:" Width="110" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding Group.BranchCode, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+        </StackPanel>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Salon:" Width="110" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding Store.Rooms}"
+                      Text="{Binding Group.RoomName, UpdateSourceTrigger=PropertyChanged}"
+                      DisplayMemberPath="Name"
+                      IsEditable="True"
+                      Width="300"/>
+        </StackPanel>
+        <CheckBox Grid.Row="5" Content="Öncelikli Sınıf" IsChecked="{Binding Group.IsPriority}" Margin="110,0,0,10"/>
+
+        <GroupBox Grid.Row="6" Header="Öğrenci Listesi" Margin="0,0,0,10">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button Content="Öğrenci Ekle" Command="{Binding AddStudentCommand}"/>
+                    <Button Content="Seçiliyi Sil" Margin="8,0,0,0" Command="{Binding RemoveStudentCommand}"/>
+                </StackPanel>
+                <DataGrid ItemsSource="{Binding Students}"
+                          SelectedItem="{Binding SelectedStudent}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Ad" Binding="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                        <DataGridTextColumn Header="Soyad" Binding="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                        <DataGridTextColumn Header="Okul No" Binding="{Binding StudentNumber, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </GroupBox>
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Kapat" Width="90" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

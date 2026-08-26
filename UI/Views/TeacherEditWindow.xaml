@@ -1,0 +1,198 @@
+﻿<Window x:Class="AutoScheduler.UI.Views.TeacherEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:uiConverters="clr-namespace:AutoScheduler.UI.Converters"
+        Title="Hoca Detayları"
+        Height="700"
+        Width="700"
+        MinHeight="700"
+        MinWidth="700"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+        <uiConverters:EnumDisplayConverter x:Key="EnumDisplay" />
+        <uiConverters:FilePathToImageSourceConverter x:Key="FilePathToImage" />
+    </Window.Resources>
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+        <Grid Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="92"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Width="78"
+                    Height="78"
+                    Style="{StaticResource AccentCardBorderStyle}"
+                    Padding="0"
+                    CornerRadius="8">
+                <Grid>
+                    <Image Source="{Binding Teacher.PhotoPath, Converter={StaticResource FilePathToImage}}"
+                           Stretch="UniformToFill"/>
+                    <TextBlock Text="&#xE77B;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="30"
+                               Foreground="{DynamicResource AppAccentBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Teacher.PhotoPath}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Teacher.PhotoPath}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Teacher.Name}" FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <Button Content="Fotoğraf Ekle..." Width="120" Click="AddPhoto_Click" ToolTip="Bu öğretmen için fotoğraf seç"/>
+                    <Button Content="Temizle" Width="80" Margin="8,0,0,0" Click="ClearPhoto_Click" ToolTip="Fotoğrafı kaldır"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
+            <TextBlock Text="Ad Soyad:" Width="90" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding Teacher.Name, UpdateSourceTrigger=PropertyChanged}" Width="360"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
+            <TextBlock Text="Tel No:" Width="90" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding Teacher.Phone, UpdateSourceTrigger=PropertyChanged}" Width="360"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
+            <TextBlock Text="Unvan:" Width="90" VerticalAlignment="Center"/>
+            <ComboBox Width="360"
+                      ItemsSource="{Binding Titles}"
+                      SelectedItem="{Binding Teacher.Title}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="Müsaitlik:" Width="90" VerticalAlignment="Center"/>
+            <ComboBox Width="360"
+                      ItemsSource="{Binding HalfDayChoices}"
+                      SelectedItem="{Binding Teacher.HalfDayAvailability}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumDisplay}}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+
+        <TextBlock Text="Müsait Olmadığı Günler:"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,4"/>
+
+        <WrapPanel Margin="0,0,0,8">
+            <ItemsControl ItemsSource="{Binding DayChoices}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Name}"
+                                  Margin="0,0,14,6"
+                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </WrapPanel>
+
+        <TextBlock Text="Nöbetçi Günleri:"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,4"/>
+
+        <WrapPanel Margin="0,0,0,8">
+            <ItemsControl ItemsSource="{Binding DutyDayChoices}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Name}"
+                                  Margin="0,0,14,6"
+                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </WrapPanel>
+
+        <StackPanel>
+        <Border
+                Style="{StaticResource CardBorderStyle}"
+                CornerRadius="8"
+                Padding="10"
+                Margin="0,0,0,8"
+                Effect="{StaticResource CardShadowEffect}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Ders tercihleri"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    <TextBlock Text="Verebileceği, istediği ve istemediği dersleri ayrı listeden düzenle."
+                               Foreground="{DynamicResource AppMutedForegroundBrush}"
+                               Margin="0,4,0,0"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+                <Button Grid.Column="1"
+                        Content="Detaylı Liste Aç..."
+                        MinWidth="140"
+                        Margin="12,0,0,0"
+                        Click="OpenCoursePreferences_Click"
+                        ToolTip="Bu öğretmenin verebileceği/istediği/istemediği dersleri düzenle"/>
+            </Grid>
+        </Border>
+        <Border
+                Style="{StaticResource CardBorderStyle}"
+                CornerRadius="8"
+                Padding="10"
+                Effect="{StaticResource CardShadowEffect}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Detaylı müsaitlik"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    <TextBlock Text="Şablondaki gün ve ders saatlerine göre müsait olmadığı saatleri düzenle."
+                               Foreground="{DynamicResource AppMutedForegroundBrush}"
+                               Margin="0,4,0,0"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+                <Button Grid.Column="1"
+                        Content="Detaylı Müsaitlik Aç..."
+                        MinWidth="160"
+                        Margin="12,0,0,0"
+                        Click="OpenDetailedAvailability_Click"
+                        ToolTip="Bu öğretmenin saat bazlı müsaitliğini düzenle"/>
+            </Grid>
+        </Border>
+        </StackPanel>
+        </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Kapat" Width="90" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

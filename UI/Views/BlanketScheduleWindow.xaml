@@ -1,0 +1,114 @@
+<Window x:Class="AutoScheduler.UI.Views.BlanketScheduleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Çarşaf Program"
+        Height="860"
+        Width="1440"
+        MinHeight="640"
+        MinWidth="1080"
+        Icon="pack://application:,,,/Assets/icon.ico"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel Background="{DynamicResource AppBackgroundBrush}">
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource AppHeaderBarBackgroundBrush}"
+                Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="Çarşaf Program"
+                               Foreground="{DynamicResource AppHeaderBarForegroundBrush}"
+                               FontSize="18"
+                               FontWeight="SemiBold"/>
+                    <TextBlock x:Name="StatusText"
+                               Foreground="#BFD1EA"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Margin="16,0,8,0">
+                    <Button Content="Alt ‹"
+                            Width="58"
+                            Height="30"
+                            Margin="0,0,6,0"
+                            Click="PreviousAlternative_Click"
+                            ToolTip="Önceki alternatif programı göster"/>
+                    <Button Content="Alt ›"
+                            Width="58"
+                            Height="30"
+                            Margin="0,0,8,0"
+                            Click="NextAlternative_Click"
+                            ToolTip="Sonraki alternatif programı göster"/>
+                    <TextBlock x:Name="AlternativeStatusText"
+                               Foreground="#DFF4EC"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="0,0,14,0"/>
+                </StackPanel>
+
+                <TextBox x:Name="SearchBox"
+                         Grid.Column="2"
+                         Width="280"
+                         Height="30"
+                         Margin="16,0,8,0"
+                         VerticalContentAlignment="Center"
+                         TextChanged="SearchBox_TextChanged"
+                         ToolTip="Öğretmen veya sınıf adına göre ara"/>
+
+                <Button Grid.Column="3"
+                        Content="Önceki"
+                        Width="76"
+                        Height="30"
+                        Margin="0,0,6,0"
+                        Click="PreviousMatch_Click"
+                        ToolTip="Önceki eşleşme"/>
+
+                <Button Grid.Column="4"
+                        Content="Sonraki"
+                        Width="76"
+                        Height="30"
+                        Margin="0,0,8,0"
+                        Click="NextMatch_Click"
+                        ToolTip="Sonraki eşleşme"/>
+
+                <Button Grid.Column="5"
+                        Grid.ColumnSpan="2"
+                        Content="Dışa Aktarım"
+                        Width="112"
+                        Height="30"
+                        Click="OpenExport_Click"
+                        ToolTip="PDF/CSV olarak dışa aktar"/>
+            </Grid>
+        </Border>
+
+        <TabControl x:Name="ModeTabs"
+                    Margin="12"
+                    SelectionChanged="ModeTabs_SelectionChanged">
+            <TabItem Header="Öğretmen Çarşafı">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              Background="White">
+                    <Grid x:Name="TeacherGrid"/>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Sınıf Çarşafı">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              Background="White">
+                    <Grid x:Name="ClassGrid"/>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

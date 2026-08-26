@@ -1,0 +1,277 @@
+﻿<UserControl x:Class="AutoScheduler.UI.Views.SchedulerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="160"/>
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource CardBorderStyle}"
+                CornerRadius="12"
+                Padding="12"
+                Margin="0,0,0,10"
+                Effect="{StaticResource CardShadowEffect}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="160"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Program Oluştur"
+                            Width="138"
+                            Background="{DynamicResource AppAccentSoftBackgroundBrush}"
+                            BorderBrush="{DynamicResource AppAccentSoftBorderBrush}"
+                            Command="{Binding GenerateCommand}"
+                            ToolTip="Mevcut atamalara göre yeni bir ders programı oluştur"/>
+                    <Button Content="Temizle"
+                            Width="86"
+                            Margin="8,0,0,0"
+                            Command="{Binding ClearCommand}"
+                            ToolTip="Oluşturulan programı temizle"/>
+                    <Button Content="Çarşaf"
+                            Width="86"
+                            Margin="8,0,0,0"
+                            Click="OpenBlanket_Click"
+                            ToolTip="Tüm öğretmen ve sınıfların çarşaf görünümünü aç"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="18,0,0,0">
+                    <Button Content="Alternatif Üret"
+                            Width="118"
+                            Command="{Binding GenerateAlternativeCommand}"
+                            ToolTip="Mevcut program için alternatif bir yerleşim üret"/>
+                    <Button Content="‹"
+                            Width="34"
+                            Margin="6,0,0,0"
+                            Command="{Binding PreviousAlternativeCommand}"
+                            ToolTip="Önceki alternatif"/>
+                    <Button Content="›"
+                            Width="34"
+                            Margin="4,0,0,0"
+                            Command="{Binding NextAlternativeCommand}"
+                            ToolTip="Sonraki alternatif"/>
+                    <Border Style="{StaticResource AccentCardBorderStyle}"
+                            CornerRadius="8"
+                            Padding="8,4"
+                            Margin="8,0,0,0">
+                        <TextBlock Text="{Binding AlternativeStatus}"
+                                   MinWidth="92"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="18,0,0,0">
+                    <Button Content="PDF Çıktısı"
+                            Width="96"
+                            Click="ExportPdf_Click"
+                            ToolTip="Görünen programı PDF olarak dışa aktar"/>
+                    <Button Content="Resmi PDF"
+                            Width="96"
+                            Margin="8,0,0,0"
+                            Click="ExportOfficialPdf_Click"
+                            ToolTip="Resmi formatta PDF olarak dışa aktar"/>
+                    <Button Content="CSV Çıktısı"
+                            Width="104"
+                            Margin="8,0,0,0"
+                            Click="ExportCsv_Click"
+                            ToolTip="Görünen programı CSV olarak dışa aktar"/>
+                </StackPanel>
+
+                <TextBlock Grid.Column="4"
+                           Text="Sınıf"
+                           Margin="18,0,8,0"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource AppAccentStrongBrush}"
+                           VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="5"
+                          ItemsSource="{Binding Groups}"
+                          SelectedItem="{Binding SelectedGroup}"
+                          DisplayMemberPath="Name"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="0,0,0,8">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsGenerating}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ProgressBar Width="220"
+                                 Height="12"
+                                 Minimum="0"
+                                 Maximum="100"
+                                 Value="{Binding GenerationProgressPercent, Mode=OneWay}"
+                                 VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding GenerationProgressPercent, StringFormat=%{0}}"
+                               Margin="10,0,0,0"
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding GenerationStatus}"
+                           Margin="0,6,0,0"
+                           VerticalAlignment="Center"
+                           FontWeight="SemiBold"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Weekly Grid (Gün x Ders Saati) -->
+        <Grid Grid.Row="2" x:Name="WeeklyGridToPrint">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header row -->
+            <ScrollViewer x:Name="HeaderScroll" Grid.Row="0" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                <StackPanel Orientation="Horizontal">
+                    <!-- sol üst boş hücre (Gün başlığı için) -->
+                    <Border Width="92" Height="36" BorderBrush="{DynamicResource AppAccentSoftBorderBrush}" BorderThickness="1" Background="{DynamicResource AppAccentSoftBackgroundBrush}"/>
+
+                    <ItemsControl ItemsSource="{Binding SlotHeaders}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="142" Height="36" BorderBrush="{DynamicResource AppAccentSoftBorderBrush}" BorderThickness="1" Background="{DynamicResource AppAccentSoftBackgroundBrush}" Padding="6,5">
+                                    <TextBlock TextWrapping="Wrap" FontWeight="SemiBold" Foreground="{DynamicResource AppAccentStrongBrush}">
+                                        <Run Text="Ders Saati " />
+                                        <Run Text="{Binding Index}" />
+                                        <Run Text=": " />
+                                        <Run Text="{Binding Label}" />
+                                    </TextBlock>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Body -->
+            <ScrollViewer x:Name="BodyScroll" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" ScrollChanged="BodyScroll_ScrollChanged">
+                <ItemsControl ItemsSource="{Binding WeeklyRows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <!-- Day header -->
+                                <Border Width="92" MinHeight="64" BorderBrush="{DynamicResource AppCardBorderBrush}" BorderThickness="1" Background="{DynamicResource AppCardBackgroundBrush}" Padding="7,7">
+                                    <TextBlock Text="{Binding DayName}" FontWeight="SemiBold" Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                                </Border>
+
+                                <ItemsControl ItemsSource="{Binding Cells}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Width="142" MinHeight="64" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" Background="{DynamicResource AppCardBackgroundBrush}" Padding="6,7">
+                                                <DockPanel>
+                                                    <Button DockPanel.Dock="Bottom"
+                                                            Content="Taşı"
+                                                            Height="22"
+                                                            Margin="0,5,0,0"
+                                                            Padding="4,0"
+                                                            FontSize="11"
+                                                            Click="MoveLesson_Click"
+                                                            ToolTip="Bu dersi başka bir güne/saate taşı">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding HasEntry}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
+                                                    <TextBox Text="{Binding EditableText, UpdateSourceTrigger=PropertyChanged}"
+                                                             Background="Transparent"
+                                                             BorderThickness="0"
+                                                             TextWrapping="Wrap"
+                                                             AcceptsReturn="True"
+                                                             VerticalScrollBarVisibility="Disabled"
+                                                             HorizontalScrollBarVisibility="Disabled"/>
+                                                </DockPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <Border CornerRadius="14"
+                    Padding="20"
+                    Width="420"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Effect="{StaticResource CardShadowEffect}">
+                <Border.Style>
+                    <Style TargetType="Border" BasedOn="{StaticResource AccentCardBorderStyle}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding WeeklyRows.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <TextBlock Text="Program görünümü henüz hazır değil"
+                               FontSize="22"
+                               FontWeight="Black"
+                               Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                    <TextBlock Text="Önce sınıf seçildiğinden emin olun, sonra Program Oluştur ile ilk yerleşimi alın."
+                               Margin="0,10,0,0"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <GroupBox Grid.Row="3" Header="Uyarılar" Margin="0,12,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="{Binding FriendlyWarningSummary}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource AppAccentStrongBrush}"
+                           Margin="0,0,0,8"/>
+                <TextBlock Grid.Row="1"
+                           Text="{Binding GenerationRecommendation}"
+                           Margin="0,0,0,8"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource AppMutedForegroundBrush}"/>
+                <ListBox Grid.Row="2" ItemsSource="{Binding Warnings}"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

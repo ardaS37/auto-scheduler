@@ -1,0 +1,137 @@
+<UserControl x:Class="AutoScheduler.UI.Views.TeachersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:uiConverters="clr-namespace:AutoScheduler.UI.Converters">
+    <UserControl.Resources>
+        <uiConverters:FilePathToImageSourceConverter x:Key="FilePathToImage" />
+    </UserControl.Resources>
+
+    <DockPanel Margin="10">
+        <Menu DockPanel.Dock="Top" Margin="0,0,0,10">
+            <MenuItem Header="Öğretmenler">
+                <MenuItem Header="Öğretmen Ekle" Command="{Binding AddTeacherCommand}"/>
+                <MenuItem Header="Öğretmen Sil" Command="{Binding RemoveTeacherCommand}"/>
+                <Separator/>
+                <MenuItem Header="Bilgileri Aç" Click="OpenTeacher_Click"/>
+                <MenuItem Header="Fotoğraf Ekle..." Click="AddPhoto_Click"/>
+                <MenuItem Header="Fotoğrafı Temizle" Click="ClearPhoto_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <Border DockPanel.Dock="Top"
+                Style="{StaticResource AccentCardBorderStyle}"
+                CornerRadius="8"
+                Padding="12"
+                Margin="0,0,0,10"
+                Effect="{StaticResource CardShadowEffect}">
+            <DockPanel>
+                <TextBlock Text="Öğretmenler"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource AppAccentStrongBrush}"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Ekle" Width="80" Command="{Binding AddTeacherCommand}" ToolTip="Yeni öğretmen ekle"/>
+                    <Button Content="Sil" Width="80" Margin="8,0,0,0" Command="{Binding RemoveTeacherCommand}" ToolTip="Seçili öğretmeni sil"/>
+                    <Button Content="Bilgiler" Width="90" Margin="8,0,0,0" Click="OpenTeacher_Click" ToolTip="Seçili öğretmenin detaylarını aç"/>
+                    <Button Content="Foto Ekle" Width="90" Margin="8,0,0,0" Click="AddPhoto_Click" ToolTip="Seçili öğretmene fotoğraf ekle"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <TextBlock DockPanel.Dock="Top"
+                   Text="Henüz öğretmen eklenmedi. Başlamak için &quot;Ekle&quot; butonunu kullanın."
+                   Foreground="{DynamicResource AppMutedForegroundBrush}"
+                   Margin="4,12,4,0"
+                   HorizontalAlignment="Center">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Teachers.Count}" Value="0">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <ListBox ItemsSource="{Binding Teachers}"
+                 SelectedItem="{Binding SelectedTeacher}"
+                 MouseDoubleClick="TeachersList_MouseDoubleClick"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Margin" Value="6"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Width="190"
+                            Height="220"
+                            Style="{StaticResource CardBorderStyle}"
+                            CornerRadius="8"
+                            Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="128"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Style="{StaticResource AccentCardBorderStyle}"
+                                    CornerRadius="6"
+                                    Padding="0">
+                                <Grid>
+                                    <Image Source="{Binding PhotoPath, Converter={StaticResource FilePathToImage}}"
+                                           Stretch="UniformToFill"/>
+                                    <TextBlock Text="&#xE77B;"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="46"
+                                               Foreground="{DynamicResource AppAccentBrush}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding PhotoPath}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PhotoPath}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Grid.Row="1"
+                                       Text="{Binding Name}"
+                                       FontWeight="SemiBold"
+                                       FontSize="15"
+                                       Foreground="{DynamicResource AppForegroundBrush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       Margin="0,10,0,0"/>
+                            <TextBlock Grid.Row="2"
+                                       Text="{Binding Phone}"
+                                       Foreground="{DynamicResource AppMutedForegroundBrush}"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Margin="0,4,0,0"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</UserControl>
