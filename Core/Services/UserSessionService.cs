@@ -22,7 +22,7 @@ namespace AutoScheduler.Core.Services
         private const int MaxRecentProjects = 8;
 
         private static string SessionDirectory =>
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AutoScheduler");
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Sapsoft", "AutoScheduler");
 
         private static string SessionFilePath => Path.Combine(SessionDirectory, "user-session.json");
         private static string AutoSaveFilePath => Path.Combine(SessionDirectory, "autosave.autosched.json");

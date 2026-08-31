@@ -31,6 +31,22 @@ namespace AutoScheduler.Core.Services
                     issues.Add(string.Format("'{0}' günü için {1}. ders saati birden fazla kez tanımlı.", day.Name, index));
             }
 
+            var pairKeys = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase);
+            foreach (var pair in store.CourseConflictPairs)
+            {
+                if (pair?.FirstCourse == null || pair.SecondCourse == null || pair.FirstCourse == pair.SecondCourse)
+                {
+                    issues.Add("Ders eşleştirmesinde iki farklı ders seçilmelidir.");
+                    continue;
+                }
+
+                var names = new[] { pair.FirstCourse.Name ?? string.Empty, pair.SecondCourse.Name ?? string.Empty }
+                    .OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase);
+                var key = string.Join("|", names);
+                if (!pairKeys.Add(key))
+                    issues.Add("Aynı ders eşleştirmesi birden fazla kez eklenmiş: " + pair.DisplayName);
+            }
+
             return issues;
         }
 

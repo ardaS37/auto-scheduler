@@ -230,7 +230,7 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel>
-                                <TextBlock Text="AutoScheduler - Ders Programı Hazırlayıcı"
+                                <TextBlock Text="Sapsoft Ders Programı Hazırlayıcı"
                                            FontSize="32"
                                            FontWeight="Black"
                                            Foreground="{DynamicResource AppAccentStrongBrush}"/>

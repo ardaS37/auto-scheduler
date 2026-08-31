@@ -140,7 +140,7 @@ namespace AutoScheduler
             try
             {
                 var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                var shortcutPath = Path.Combine(desktop, "AutoScheduler.lnk");
+                var shortcutPath = Path.Combine(desktop, "Sapsoft Ders Programı Hazırlayıcı.lnk");
                 var exePath = Process.GetCurrentProcess().MainModule.FileName;
 
                 var shellType = Type.GetTypeFromProgID("WScript.Shell");
@@ -152,7 +152,7 @@ namespace AutoScheduler
                 shortcut.TargetPath = exePath;
                 shortcut.WorkingDirectory = Path.GetDirectoryName(exePath);
                 shortcut.IconLocation = exePath + ",0";
-                shortcut.Description = "AutoScheduler - Ders Programı Hazırlayıcı";
+                shortcut.Description = "Sapsoft Ders Programı Hazırlayıcı";
                 shortcut.Save();
 
                 MessageBox.Show(this, "Masaüstü kısayolu oluşturuldu.", "Kısayol", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -240,12 +240,11 @@ namespace AutoScheduler
             if (vm == null)
                 return;
 
-            MessageBox.Show(
-                this,
-                "AutoScheduler kullandığınız için teşekkürler. Geri bildirimlerinizi bu projenin GitHub sayfası üzerinden paylaşabilirsiniz.",
-                "Geri Bildirim",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            var feedbackWindow = new StartupFeedbackWindow
+            {
+                Owner = this
+            };
+            feedbackWindow.ShowDialog();
 
             if (vm.ShouldShowWelcomeTutorial())
                 ShowWelcomeTutorial(vm);

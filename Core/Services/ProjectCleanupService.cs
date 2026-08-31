@@ -141,6 +141,9 @@ namespace AutoScheduler.Core.Services
             foreach (var entry in store.Schedule.Where(s => s.Course == course).ToList())
                 store.Schedule.Remove(entry);
 
+            foreach (var pair in store.CourseConflictPairs.Where(pair => pair.FirstCourse == course || pair.SecondCourse == course).ToList())
+                store.CourseConflictPairs.Remove(pair);
+
             foreach (var teacher in store.Teachers)
             {
                 while (teacher.CanTeachCourses.Contains(course))

@@ -37,6 +37,19 @@ namespace AutoScheduler.UI.Views
             win.ShowDialog();
         }
 
+        private void CourseConflicts_Click(object sender, RoutedEventArgs e)
+        {
+            var vm = DataContext as AssignmentsViewModel;
+            if (vm == null) return;
+
+            var win = new CourseConflictWindow
+            {
+                Owner = Window.GetWindow(this),
+                DataContext = new CourseConflictViewModel(vm.Store)
+            };
+            win.ShowDialog();
+        }
+
         private bool _committing;
 
         private void CommitGridEdits(DataGrid dg)

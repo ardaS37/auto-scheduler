@@ -10,11 +10,11 @@ using System.Windows;
 // Bir bütünleştirilmiş koda ilişkin Genel Bilgiler aşağıdaki öznitelikler kümesiyle
 // denetlenir. Bütünleştirilmiş kod ile ilişkili bilgileri değiştirmek için
 // bu öznitelik değerlerini değiştirin.
-[assembly: AssemblyTitle("AutoScheduler")]
+[assembly: AssemblyTitle("Sapsoft Ders Programı Hazırlayıcı")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("AutoScheduler")]
-[assembly: AssemblyProduct("AutoScheduler")]
+[assembly: AssemblyCompany("Sapsoft")]
+[assembly: AssemblyProduct("Sapsoft Ders Programı Hazırlayıcı")]
 [assembly: AssemblyCopyright("Copyright ©  2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -51,6 +51,6 @@ using System.Windows;
 //      Yapı Numarası
 //      Düzeltme
 //
-[assembly: AssemblyVersion("2.3.2.0")]
-[assembly: AssemblyFileVersion("2.3.2.0")]
-[assembly: AssemblyInformationalVersion("v2.3.2")]
+[assembly: AssemblyVersion("2.3.3.0")]
+[assembly: AssemblyFileVersion("2.3.3.0")]
+[assembly: AssemblyInformationalVersion("v2.3.3")]

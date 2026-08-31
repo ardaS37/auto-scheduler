@@ -12,14 +12,22 @@
     <Deterministic>true</Deterministic>
     <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
 
+    <!-- Microsoft Store (MSIX) single-project packaging -->
+    <WindowsPackageType>MSIX</WindowsPackageType>
     <Platforms>x86;x64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <SelfContained>true</SelfContained>
     <SatelliteResourceLanguages>tr;en</SatelliteResourceLanguages>
+    <GenerateAppInstallerFile>false</GenerateAppInstallerFile>
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <AppxAutoIncrementPackageRevision>false</AppxAutoIncrementPackageRevision>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.2428" />
   </ItemGroup>
 
   <ItemGroup>

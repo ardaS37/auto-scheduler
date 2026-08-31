@@ -69,6 +69,7 @@
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
                 <Button Style="{StaticResource IconButtonStyle}" Content="+" Command="{Binding AddCourseCommand}" ToolTip="Yeni ders ekle"/>
                 <Button Style="{StaticResource IconButtonStyle}" Content="-" Margin="6,0,0,0" Command="{Binding RemoveCourseCommand}" ToolTip="Seçili dersi sil"/>
+                <Button Content="Ders Çakışması..." Margin="10,0,0,0" Click="CourseConflicts_Click" ToolTip="Aynı anda verilmemesi gereken ders çiftlerini tanımla"/>
             </StackPanel>
 
             <TextBlock DockPanel.Dock="Top"

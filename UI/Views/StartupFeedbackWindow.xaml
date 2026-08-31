@@ -1,0 +1,29 @@
+<Window x:Class="AutoScheduler.UI.Views.StartupFeedbackWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Geri Bildirim ve Destek"
+        Width="620"
+        Height="360"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Geri Bildirim ve Destek" FontSize="23" FontWeight="Black" Foreground="{DynamicResource AppAccentStrongBrush}"/>
+        <StackPanel Grid.Row="1" Margin="0,14,0,0">
+            <TextBlock Text="Merhaba, bu programı kullandıktan sonra vaktinizi ayırıp geri bildirimlerinizi yazmanız benim için çok kıymetli. Proje ile ilgili değerlendirmelerinizi Microsoft Store mağazasına veya ardasaplioglu37@gmail.com adresine yazabilirsiniz. Bir sorun olursa bu mail adresinden iletişime geçmekten çekinmeyin."
+                       TextWrapping="Wrap"/>
+            <TextBlock Text="Çalışmalarımı buradan destekleyebilirsiniz:" Margin="0,18,0,7" FontWeight="SemiBold"/>
+            <TextBlock>
+                <Hyperlink NavigateUri="https://www.patreon.com/checkout/ardasaplioglu?rid=29454363" RequestNavigate="Link_RequestNavigate">Patreon üzerinden destek ol</Hyperlink>
+            </TextBlock>
+            <TextBlock Margin="0,8,0,0">
+                <Hyperlink NavigateUri="https://github.com/ardaS37" RequestNavigate="Link_RequestNavigate">GitHub çalışmalarım</Hyperlink>
+            </TextBlock>
+        </StackPanel>
+        <Button Grid.Row="2" Content="Devam Et" Width="105" HorizontalAlignment="Right" IsDefault="True" Click="Continue_Click"/>
+    </Grid>
+</Window>

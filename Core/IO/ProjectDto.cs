@@ -64,6 +64,7 @@ namespace AutoScheduler.Core.IO
         public List<TeacherDto> Teachers { get; set; } = new List<TeacherDto>();
 
         public List<AssignmentDto> Assignments { get; set; } = new List<AssignmentDto>();
+        public List<CourseConflictPairDto> CourseConflictPairs { get; set; } = new List<CourseConflictPairDto>();
         public List<GroupSlotRuleDto> GroupSlotRules { get; set; } = new List<GroupSlotRuleDto>();
         public List<CourseKindSlotRuleDto> CourseKindSlotRules { get; set; } = new List<CourseKindSlotRuleDto>();
         public List<FixedLessonDto> FixedLessons { get; set; } = new List<FixedLessonDto>();
@@ -161,6 +162,12 @@ namespace AutoScheduler.Core.IO
         // K12 distribution
         public bool SpreadAcrossDays { get; set; }
         public int MaxPerDay { get; set; }
+    }
+
+    public sealed class CourseConflictPairDto
+    {
+        public string FirstCourseName { get; set; }
+        public string SecondCourseName { get; set; }
     }
 
     public sealed class FixedLessonDto

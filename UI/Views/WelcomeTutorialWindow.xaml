@@ -19,7 +19,7 @@
                 Padding="18"
                 Effect="{StaticResource CardShadowEffect}">
             <StackPanel>
-                <TextBlock Text="AutoScheduler - Ders Programı Hazırlayıcı"
+                <TextBlock Text="Sapsoft Ders Programı Hazırlayıcı"
                            FontSize="30"
                            FontWeight="Black"
                            Foreground="{DynamicResource AppAccentStrongBrush}"/>

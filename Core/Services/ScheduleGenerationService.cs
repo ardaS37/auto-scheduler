@@ -500,6 +500,27 @@ namespace AutoScheduler.Core.Services
                 return true;
             }
 
+            bool AreCoursesPaired(Course firstCourse, Course secondCourse)
+            {
+                if (firstCourse == null || secondCourse == null || firstCourse == secondCourse)
+                    return false;
+
+                return store.CourseConflictPairs.Any(pair => pair != null &&
+                    ((pair.FirstCourse == firstCourse && pair.SecondCourse == secondCourse) ||
+                     (pair.FirstCourse == secondCourse && pair.SecondCourse == firstCourse)));
+            }
+
+            bool HasPairedCourseAtSlot(Course course, Day day, int slotIndex)
+            {
+                if (course == null || day == null)
+                    return false;
+
+                return result.Schedule.Any(entry =>
+                    entry.Day == day &&
+                    entry.SlotIndex == slotIndex &&
+                    AreCoursesPaired(course, entry.Course));
+            }
+
             int GetGroupGapCount(ClassGroup group, Day day, int candidateStartIndex, int candidateBlockSize)
             {
                 if (group == null || day == null) return 0;
@@ -809,6 +830,7 @@ namespace AutoScheduler.Core.Services
                                 if (!slotByIndex.TryGetValue(idx, out var ts)) { ok = false; break; }
                                 if (!IsAllowed(group, day, idx)) { ok = false; break; }
                                 if (!IsFree(group, teacher, candidateRoom, day, idx)) { ok = false; break; }
+                                if (HasPairedCourseAtSlot(a.Course, day, idx)) { ok = false; break; }
                                 if (OverlapsLunchBreak(ts)) { ok = false; break; }
                                 if (!TeacherHalfDayOk(teacher, ts)) { ok = false; break; }
                                 if (!TeacherDetailedAvailabilityOk(teacher, day, idx)) { ok = false; break; }
@@ -949,6 +971,7 @@ namespace AutoScheduler.Core.Services
                 if (slot == null) return false;
                 if (options.RespectTeacherUnavailableDays && teacher != null && teacher.UnavailableDayNames.Contains(day.Name)) return false;
                 if (!IsAllowed(group, day, slotIndex)) return false;
+                if (HasPairedCourseAtSlot(a != null ? a.Course : null, day, slotIndex)) return false;
                 if (!TeacherHalfDayOk(teacher, slot)) return false;
                 if (!TeacherDetailedAvailabilityOk(teacher, day, slotIndex)) return false;
                 if (OverlapsLunchBreak(slot)) return false;
@@ -1381,6 +1404,7 @@ namespace AutoScheduler.Core.Services
                     if (!slotByIndex.TryGetValue(idx, out var ts)) { ok = false; break; }
                     if (!IsAllowed(fixedLesson.Group, fixedLesson.Day, idx)) { ok = false; break; }
                     if (!IsFree(fixedLesson.Group, fixedLesson.Teacher, fixedLesson.Room, fixedLesson.Day, idx)) { ok = false; break; }
+                    if (HasPairedCourseAtSlot(fixedLesson.Course, fixedLesson.Day, idx)) { ok = false; break; }
                     if (OverlapsLunchBreak(ts)) { ok = false; break; }
                     if (!TeacherHalfDayOk(fixedLesson.Teacher, ts)) { ok = false; break; }
                     if (!TeacherDetailedAvailabilityOk(fixedLesson.Teacher, fixedLesson.Day, idx)) { ok = false; break; }

@@ -621,6 +621,7 @@ namespace AutoScheduler.UI.ViewModels
             AttachCollection(Store.Rooms);
             AttachCollection(Store.Days);
             AttachCollection(Store.Assignments);
+            AttachCollection(Store.CourseConflictPairs);
             AttachCollection(Store.GroupSlotRules);
             AttachCollection(Store.CourseKindSlotRules);
             AttachCollection(Store.FixedLessons);
@@ -632,6 +633,7 @@ namespace AutoScheduler.UI.ViewModels
             TrackObjects(Store.Rooms.Cast<object>());
             TrackObjects(Store.Days.Cast<object>());
             TrackObjects(Store.Assignments.Cast<object>());
+            TrackObjects(Store.CourseConflictPairs.Cast<object>());
             TrackObjects(Store.GroupSlotRules.Cast<object>());
             TrackObjects(Store.CourseKindSlotRules.Cast<object>());
             TrackObjects(Store.FixedLessons.Cast<object>());

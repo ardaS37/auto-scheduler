@@ -164,6 +164,15 @@ namespace AutoScheduler.Core.IO
                 MaxPerDay = a.MaxPerDay
             }).ToList();
 
+            dto.CourseConflictPairs = store.CourseConflictPairs
+                .Where(pair => pair?.FirstCourse != null && pair.SecondCourse != null && pair.FirstCourse != pair.SecondCourse)
+                .Select(pair => new CourseConflictPairDto
+                {
+                    FirstCourseName = pair.FirstCourse.Name,
+                    SecondCourseName = pair.SecondCourse.Name
+                })
+                .ToList();
+
             dto.FixedLessons = store.FixedLessons.Select(f => new FixedLessonDto
             {
                 GroupName = f.Group != null ? f.Group.Name : null,
@@ -215,6 +224,7 @@ namespace AutoScheduler.Core.IO
             store.Rooms.Clear();
             store.Teachers.Clear();
             store.Assignments.Clear();
+            store.CourseConflictPairs.Clear();
             store.GroupSlotRules.Clear();
             store.CourseKindSlotRules.Clear();
             store.FixedLessons.Clear();
@@ -378,6 +388,30 @@ namespace AutoScheduler.Core.IO
             var roomByName = store.Rooms.ToDictionary(x => x.Name, x => x);
             var dayByName = store.Days.ToDictionary(x => x.Name, x => x);
             var teacherByName = store.Teachers.ToDictionary(x => x.Name, x => x);
+
+            // Ders eşleştirmeleri, dersler yüklendikten sonra ad üzerinden yeniden bağlanır.
+            if (dto.CourseConflictPairs != null)
+            {
+                foreach (var pair in dto.CourseConflictPairs)
+                {
+                    if (pair == null || string.IsNullOrWhiteSpace(pair.FirstCourseName) || string.IsNullOrWhiteSpace(pair.SecondCourseName))
+                        continue;
+                    if (!courseByName.TryGetValue(pair.FirstCourseName, out var firstCourse) ||
+                        !courseByName.TryGetValue(pair.SecondCourseName, out var secondCourse) ||
+                        firstCourse == secondCourse)
+                        continue;
+                    if (store.CourseConflictPairs.Any(existing =>
+                        (existing.FirstCourse == firstCourse && existing.SecondCourse == secondCourse) ||
+                        (existing.FirstCourse == secondCourse && existing.SecondCourse == firstCourse)))
+                        continue;
+
+                    store.CourseConflictPairs.Add(new CourseConflictPair
+                    {
+                        FirstCourse = firstCourse,
+                        SecondCourse = secondCourse
+                    });
+                }
+            }
 
             // Teacher.CanTeachCourses + UnavailableDays
             foreach (var t in dto.Teachers)

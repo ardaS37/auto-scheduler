@@ -30,6 +30,9 @@ namespace AutoScheduler.Core.Store
         public ObservableCollection<Assignment> Assignments { get; } =
             new ObservableCollection<Assignment>();
 
+        public ObservableCollection<CourseConflictPair> CourseConflictPairs { get; } =
+            new ObservableCollection<CourseConflictPair>();
+
         public ObservableCollection<GroupSlotRule> GroupSlotRules { get; } =
             new ObservableCollection<GroupSlotRule>();
 
