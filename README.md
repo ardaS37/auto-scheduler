@@ -35,3 +35,13 @@ Uygulama ders programı proje dosyalarını yerel olarak saklar. Gerçek öğren
 ## License
 
 No license is granted. All rights reserved.
+
+<!-- project-screenshot-gallery:start -->
+## Screenshots
+
+Screenshot from the [Microsoft Store listing](https://apps.microsoft.com/detail/9p68crlg39px?hl=tr-TR&gl=TR).
+
+<p>
+  <a href="docs/screenshots/readme/01-microsoft-store.png"><img src="docs/screenshots/readme/01-microsoft-store.png" alt="Timetable planner on Microsoft Store" width="440"></a>
+</p>
+<!-- project-screenshot-gallery:end -->
